@@ -286,71 +286,6 @@ public class Compilador extends javax.swing.JFrame {
                 return;
             }
         }
-
-        /*
-        String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION"};
-
-        String texto = this.txtATexto1.getText();
-
-        StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
-        
-
-        while (tokens.hasMoreTokens()) {
-            String sentencia = tokens.nextToken();
-            String pal = "";
-            boolean r = true;
-            String array[] = new String[20];
-            for (int a = 0; a < palabras.length; a++) {
-                if(sentencia.matches("SUMA.*\\s.*\\d.*\\s.*\\d")||sentencia.matches("RESTA.*\\s.*\\d.*\\s.*\\d")){
-                    a = palabras.length;
-                    r = true;
-                    Error.setText("Compilado Exitosamente!\n");
-                    System.out.println("Entra al if de ejecucion");
-                    System.out.println(sentencia);
-                    pal = sentencia; 
-                    array = pal.split(" ");
-                    System.out.println(array[0]);
-                   
-                }
-                 else {
-                    r = false;
-                    this.Error.setText("Error de sintaxis. '" + sentencia + "' no ha sido encontrada XDXD");
-                }
-            }
-
-            if (!r || r == false) {
-                this.Error.setText("Error de sintaxis. '" + texto + "' no ha sido encontrada");
-            }
-            String message = this.Error.getText(); 
-            switch (array[0]) {
-                case "SUMA": //Significa que los siguientes dos, son numeros
-                    int suma = Integer.parseInt(array[1]) + Integer.parseInt(array[2]);
-                    
-                    this.Error.setText(message+"\nLa suma de los numeros es: "+suma+"\n");
-                    //String sumtext = "La suma de los numeros es: "+suma;
-                break;
-                case "RESTA":
-              int resta = Integer.parseInt(array[1]) - Integer.parseInt(array[2]);
-                    this.Error.setText(message+"El resultado de la resta es: "+resta);
-              //String resttext = "El resultado de la resta es: " +resta;
-              
-                break;
-                case "ACTIVAR = SERVO":
-                
-                case "OBTENER = TEMP":
-                
-                break;
-                case "INTENSIDAD = LUZ":
-                break;
-                default:
-                this.Error.setText("Error de sintaxis. '" + texto + "' no ha sido encontrada SEXO");
-                break;
-            }
-
-
-        }
-         */
-
     }//GEN-LAST:event_compejecutarActionPerformed
 
     public void switchFun(int pPoss, String pValues) {
@@ -375,16 +310,14 @@ public class Compilador extends javax.swing.JFrame {
                  int div = Integer.parseInt(array[1]) / Integer.parseInt(array[2]);
                 this.Error.setText(consola + "\nDivision: "+div + "\n");
                 break;
-
             case 4:
                 String imp = array[1];
-                this.Error.setText(consola + "\nImprimir:"+ imp+ "\n");
+                this.Error.setText(consola + "\nMensaje:"+ imp+ "\n");
                 break;
             default:
                 this.Error.setText("ME CAGO EN CHANTO Y EN JONATHAN. ESTA MIERDA NO FUNCA");
                 break;
         }
-
     }
 
 //Funcion sintaxis
