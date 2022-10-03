@@ -14,11 +14,17 @@ import java.util.StringTokenizer;
 public class Compilador extends javax.swing.JFrame {
 
     /**
-     
+     *
      */
-       int cont = 0;
-       int num1; 
-       int num2;
+    String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION", "IMPRIMIR"};
+    String delimitadorNumber = "*\\s.*\\d.*\\s.*\\d";
+
+    String delimitadorLetter = "*\\s.*\\w";
+
+    int cont = 0;
+    int num1;
+    int num2;
+
     public Compilador() {
         initComponents();
     }
@@ -235,36 +241,24 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_txtATexto1KeyReleased
 
     private void CompilarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CompilarActionPerformed
-        String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION"};
-        String sent = this.txtATexto1.getText();
 
-        StringTokenizer tokens = new StringTokenizer(sent, ";\n\r");
-        /*while(tokens.hasMoreTokens()){
-            System.out.println(tokens.nextToken());
-        }*/
+        String texto = this.txtATexto1.getText();
+        this.Error.setText(" ");
+        StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
+
+        String sentencia = " ";
+        byte i = 0;
+
         while (tokens.hasMoreTokens()) {
-            String sentencia = tokens.nextToken();
-            boolean r = true;
-
-            for (int a = 0; a < palabras.length; a++) {
-                String ps = palabras[a];
-                if(sentencia.matches("SUMA.*\\s.*\\d.*\\s.*\\d")||sentencia.matches("RESTA.*\\s.*\\d.*\\s.*\\d")){
-                     a = palabras.length;
-                    r = true;
-                    Error.setText("Compilado Exitosamente!");
-                }
-                 else {
-                    r = false;
-                    this.Error.setText("Error de sintaxis. '" + sent + "' no ha sido encontrada");
-                    
-                }
+            sentencia = tokens.nextToken();
+            i = this.sintaxis2(sentencia);
+            if (i > 0 || 0 == i) {
+                Error.setText("Compilado Exitosamente!");
+            } else {
+                return;
             }
-
-            if (!r || r == false) {
-                this.Error.setText("Error de sintaxis. '" + sent + "' no ha sido encontrada");
-            }
-
         }
+
     }//GEN-LAST:event_CompilarActionPerformed
 
     private void LimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LimpiarActionPerformed
@@ -275,7 +269,25 @@ public class Compilador extends javax.swing.JFrame {
 
     private void compejecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_compejecutarActionPerformed
 
+        String texto = this.txtATexto1.getText();
+        this.Error.setText(" ");
+        StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
+        String pal = "";
+        String sentencia = " ";
+        byte i = 0;
 
+        while (tokens.hasMoreTokens()) {
+            sentencia = tokens.nextToken();
+            i = this.sintaxis2(sentencia);
+            if (i > 0 || 0 == i) {
+                pal = sentencia;
+                this.switchFun(i, pal);
+            } else {
+                return;
+            }
+        }
+
+        /*
         String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION"};
 
         String texto = this.txtATexto1.getText();
@@ -337,8 +349,69 @@ public class Compilador extends javax.swing.JFrame {
 
 
         }
-        
+         */
+
     }//GEN-LAST:event_compejecutarActionPerformed
+
+    public void switchFun(int pPoss, String pValues) {
+        String consola = this.Error.getText();
+        String array[] = new String[24];
+        array = pValues.split(" ");
+        switch (pPoss) {
+            case 0:
+                this.Error.setText(consola + "\n" + "SUMA:" + "\n");
+                int suma = Integer.parseInt(array[1]) + Integer.parseInt(array[2]);
+                this.Error.setText(consola + "\nLa suma de los numeros es: " + suma + "\n");
+                break;
+            case 1:
+                int resta = Integer.parseInt(array[1]) - Integer.parseInt(array[2]);
+                this.Error.setText(consola + "\nEl resultado de la resta es: " + resta + "\n");
+                break;
+            case 2:
+                 int mlt = Integer.parseInt(array[1]) * Integer.parseInt(array[2]);
+                this.Error.setText(consola + "\nMultiplicacion:"+mlt+"\n");
+                break;
+            case 3:
+                 int div = Integer.parseInt(array[1]) / Integer.parseInt(array[2]);
+                this.Error.setText(consola + "\nDivision: "+div + "\n");
+                break;
+
+            case 4:
+                String imp = array[1];
+                this.Error.setText(consola + "\nImprimir:"+ imp+ "\n");
+                break;
+            default:
+                this.Error.setText("ME CAGO EN CHANTO Y EN JONATHAN. ESTA MIERDA NO FUNCA");
+                break;
+        }
+
+    }
+
+//Funcion sintaxis
+    public byte sintaxis2(String pSentencia) {
+        StringTokenizer tokens = new StringTokenizer(pSentencia, ";\n\r");
+        byte result = -2;
+
+        String sentencia = tokens.nextToken();
+        String textError = "";
+        if (sentencia.matches(this.palabras[0] + this.delimitadorNumber)) { // Suma                                       
+            return result = 0;
+        } else if (sentencia.matches(this.palabras[1] + this.delimitadorNumber)) {
+            return result = 1;
+        } else if (sentencia.matches(this.palabras[2] + this.delimitadorNumber)) {
+            return result = 2;
+        } else if (sentencia.matches(this.palabras[3] + this.delimitadorNumber)) {
+            return result = 3;
+        } else if (sentencia.matches(this.palabras[4] + this.delimitadorLetter)) {
+            return result = 4;
+        }
+        textError = sentencia;
+        if (result < 0) {
+            this.Error.setText("Error de sintaxis. '" + textError + "' No es Valido");
+            return result;
+        }
+        return result;
+    }
 
     /**
      * @param args the command line arguments
