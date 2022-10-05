@@ -19,6 +19,78 @@ public class Compilador extends javax.swing.JFrame {
        int cont = 0;
        int num1; 
        int num2;
+       //Expresiones regulares
+       String palabras[] = {"SUMA","RESTA","MULTIPLICACION","DIVISION", "INT", "IMPRIMIR"}; //conjunto de palabras reservadas
+       String numberDel = "*\\s.*\\d.*\\s.*\\d";  //Expresion regular para poner numeros
+       String varDel = "*\\s.*\\w*\\s*\\d"; //expresion regular para poner variables
+       String letterDel = "*\\s.*\\w";
+       
+       public byte sintax(String pSentencia){
+           StringTokenizer tokens = new StringTokenizer(pSentencia, ";\n\r"); //no c pq se hace esto de nuevo porque creo que ya se hizo, pero no pasa nada si se queda
+           byte result = -2; 
+           
+           String sentencia = tokens.nextToken();
+           String error = " ";
+           if(sentencia.matches(this.palabras[0]+this.numberDel)){ //Suma
+               return result = 0;
+           } else if(sentencia.matches(this.palabras[1]+this.numberDel)){ //Resta
+               return result = 1;
+           } else if(sentencia.matches(this.palabras[2]+this.numberDel)){ //Multiplicacion
+               return result = 2;
+           } else if(sentencia.matches(this.palabras[3]+this.numberDel)){ //Division
+               return result = 3;
+           } else if(sentencia.matches(this.palabras[4]+this.varDel)){ //Declaracion de variables
+               return result = 4;
+           } else if(sentencia.matches(this.palabras[5]+this.letterDel)){ //imprimir
+               return result = 5;
+           }
+           error = sentencia;
+           if(result < 0){
+               this.Error.setText("Error de sintaxis. "+ error + " no es valido");
+           }
+           return result; 
+       }
+       
+       public void switchFun(int pPoss, String sentencia){
+           String array[]; //arreglo de 20 (espero que sea suficiente) para almacenar las partes del token y poder dividir palabras claves de variables o numeros
+           int resultado;
+           String text = this.Error.getText();
+           switch(pPoss){ //Dependiendo del numero que devuelve la funcion de sintaxis, va a entrar a uno uu otro sqitch
+               case 0: //Suma
+                   array = sentencia.split(" "); //Aqui dividimos el token para que la palabra quede separada de los numeros
+                   resultado = Integer.parseInt(array[1]) + Integer.parseInt(array[2]);
+                   this.Error.setText(text + "\n" + "El resultado de la suma es: "+resultado);
+                   break;
+               case 1: //Resta
+                   array = sentencia.split(" ");
+                   resultado = Integer.parseInt(array[1]) - Integer.parseInt(array[2]);
+                   this.Error.setText(text + "\n" + "El resultado de la resta es: "+resultado);
+                   break; 
+               case 2: //Multiplicacion
+                   array = sentencia.split(" ");
+                   resultado = Integer.parseInt(array[1]) * Integer.parseInt(array[2]);
+                   this.Error.setText(text + "\n" + "El resultado de la multiplicacion es: "+resultado);
+                   break;
+               case 3: //Division
+                   array = sentencia.split(" ");
+                   resultado = Integer.parseInt(array[1]) / Integer.parseInt(array[2]);
+                   this.Error.setText(text + "\n" + "El resultado de la division es: "+resultado);
+                   break;
+               case 4: //Declaracion de variables (proximo a programar)
+                   break;
+               case 5: //Imprimir
+                   array = sentencia.split(" ");
+                   System.out.println(array.length);
+                   String mensaje = ""; 
+                   for(int i = 1; i < array.length; i++){
+                       mensaje = mensaje + " " +array[i];
+                   }
+                   this.Error.setText(mensaje);
+                   break;
+                
+           }
+       }
+       
     public Compilador() {
         initComponents();
     }
@@ -235,35 +307,20 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_txtATexto1KeyReleased
 
     private void CompilarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CompilarActionPerformed
-        String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION"};
-        String sent = this.txtATexto1.getText();
-
-        StringTokenizer tokens = new StringTokenizer(sent, ";\n\r");
-        /*while(tokens.hasMoreTokens()){
-            System.out.println(tokens.nextToken());
-        }*/
+        String texto = this.txtATexto1.getText();
+        this.Error.setText(" ");
+        StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
+        String sentencia = tokens.nextToken();
+        byte i = 0;
         while (tokens.hasMoreTokens()) {
-            String sentencia = tokens.nextToken();
-            boolean r = true;
-
-            for (int a = 0; a < palabras.length; a++) {
-                String ps = palabras[a];
-                if(sentencia.matches("SUMA.*\\s.*\\d.*\\s.*\\d")||sentencia.matches("RESTA.*\\s.*\\d.*\\s.*\\d")){
-                     a = palabras.length;
-                    r = true;
-                    Error.setText("Compilado Exitosamente!");
-                }
-                 else {
-                    r = false;
-                    this.Error.setText("Error de sintaxis. '" + sent + "' no ha sido encontrada");
-                    
-                }
+            sentencia = tokens.nextToken(); 
+            i = this.sintax(sentencia);
+            if(i>=0){
+                Error.setText("Compilado Exitosamente!");
+            }else{
+                System.out.println("Fallo en el compilar XD");
+                return;
             }
-
-            if (!r || r == false) {
-                this.Error.setText("Error de sintaxis. '" + sent + "' no ha sido encontrada");
-            }
-
         }
     }//GEN-LAST:event_CompilarActionPerformed
 
@@ -274,70 +331,19 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_LimpiarActionPerformed
 
     private void compejecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_compejecutarActionPerformed
-
-
-        String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION"};
-
         String texto = this.txtATexto1.getText();
-
         StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
-        
-
-        while (tokens.hasMoreTokens()) {
-            String sentencia = tokens.nextToken();
-            String pal = "";
-            boolean r = true;
-            String array[] = new String[20];
-            for (int a = 0; a < palabras.length; a++) {
-                if(sentencia.matches("SUMA.*\\s.*\\d.*\\s.*\\d")||sentencia.matches("RESTA.*\\s.*\\d.*\\s.*\\d")){
-                    a = palabras.length;
-                    r = true;
-                    Error.setText("Compilado Exitosamente!\n");
-                    System.out.println("Entra al if de ejecucion");
-                    System.out.println(sentencia);
-                    pal = sentencia; 
-                    array = pal.split(" ");
-                    System.out.println(array[0]);
-                   
-                }
-                 else {
-                    r = false;
-                    this.Error.setText("Error de sintaxis. '" + sentencia + "' no ha sido encontrada XDXD");
-                }
+        String sentencia = "";
+        byte i = 0;
+        while(tokens.hasMoreTokens()){
+            sentencia = tokens.nextToken();
+            i = this.sintax(sentencia);
+            if(i >= 0){
+                this.switchFun(i, sentencia);
+            } else{
+                return;
             }
-
-            if (!r || r == false) {
-                this.Error.setText("Error de sintaxis. '" + texto + "' no ha sido encontrada");
-            }
-            String message = this.Error.getText(); 
-            switch (array[0]) {
-                case "SUMA": //Significa que los siguientes dos, son numeros
-                    int suma = Integer.parseInt(array[1]) + Integer.parseInt(array[2]);
-                    
-                    this.Error.setText(message+"\nLa suma de los numeros es: "+suma+"\n");
-                    //String sumtext = "La suma de los numeros es: "+suma;
-                break;
-                case "RESTA":
-              int resta = Integer.parseInt(array[1]) - Integer.parseInt(array[2]);
-                    this.Error.setText(message+"El resultado de la resta es: "+resta);
-              //String resttext = "El resultado de la resta es: " +resta;
-              
-                break;
-                case "ACTIVAR = SERVO":
-                
-                case "OBTENER = TEMP":
-                
-                break;
-                case "INTENSIDAD = LUZ":
-                break;
-                default:
-                this.Error.setText("Error de sintaxis. '" + texto + "' no ha sido encontrada SEXO");
-                break;
-            }
-
-
         }
-        
     }//GEN-LAST:event_compejecutarActionPerformed
 
     /**
