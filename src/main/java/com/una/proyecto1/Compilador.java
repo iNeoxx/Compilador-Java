@@ -85,7 +85,7 @@ public class Compilador extends javax.swing.JFrame {
                    for(int i = 1; i < array.length; i++){
                        mensaje = mensaje + " " +array[i];
                    }
-                   this.Error.setText(mensaje);
+                   this.Error.setText(text + "\n" + mensaje);
                    break;
                 
            }
