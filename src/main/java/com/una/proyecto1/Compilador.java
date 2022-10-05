@@ -6,6 +6,7 @@ package com.una.proyecto1;
 
 import java.lang.reflect.Array;
 import java.util.StringTokenizer;
+import java.util.HashMap;
 
 /**
  *
@@ -24,6 +25,8 @@ public class Compilador extends javax.swing.JFrame {
        String numberDel = "*\\s.*\\d.*\\s.*\\d";  //Expresion regular para poner numeros
        String varDel = "*\\s.*\\w*\\s*\\d"; //expresion regular para poner variables
        String letterDel = "*\\s.*\\w";
+       String singleNum = "*\\s.*\\d";
+       HashMap<String, Integer> vars = new HashMap<>();
        
        public byte sintax(String pSentencia){
            StringTokenizer tokens = new StringTokenizer(pSentencia, ";\n\r"); //no c pq se hace esto de nuevo porque creo que ya se hizo, pero no pasa nada si se queda
@@ -43,6 +46,33 @@ public class Compilador extends javax.swing.JFrame {
                return result = 4;
            } else if(sentencia.matches(this.palabras[5]+this.letterDel)){ //imprimir
                return result = 5;
+           }
+           //Aqui vamos a jugar con las funciones usando variables previamente almacenadas; 
+           //entonces, las posibilidades son PALABRARESERVADA varaible numero, PALABRARESERVADA numero variable.
+           else if(sentencia.matches(this.palabras[0]+this.letterDel+this.singleNum)){ //SUMA var num
+               return result = 6;
+           } else if(sentencia.matches(this.palabras[0]+this.singleNum+this.letterDel)){ //SUMA num var
+               return result = 7; 
+           } else if(sentencia.matches(this.palabras[0] + this.letterDel + this.letterDel)){ //SUMA var var
+               return result = 8;
+           } else if(sentencia.matches(this.palabras[1]+this.letterDel+this.singleNum)){ //RESTA var num
+               return result = 9;
+           } else if(sentencia.matches(this.palabras[1]+this.singleNum+this.letterDel)){ //RESTA num var
+               return result = 10; 
+           } else if(sentencia.matches(this.palabras[1] + this.letterDel + this.letterDel)){ //RESTA var var
+               return result = 11;
+           }else if(sentencia.matches(this.palabras[2]+this.letterDel+this.singleNum)){ //MULTIPLICACION var num
+               return result = 12;
+           } else if(sentencia.matches(this.palabras[2]+this.singleNum+this.letterDel)){ //MULTIPLICACION num var
+               return result = 13; 
+           } else if(sentencia.matches(this.palabras[2] + this.letterDel + this.letterDel)){ //MULTIPLICACION var var
+               return result = 14;
+           }else if(sentencia.matches(this.palabras[3]+this.letterDel+this.singleNum)){ //DIVISION var num
+               return result = 15;
+           } else if(sentencia.matches(this.palabras[3]+this.singleNum+this.letterDel)){ //DIVISION num var
+               return result = 16; 
+           } else if(sentencia.matches(this.palabras[3] + this.letterDel + this.letterDel)){ //DIVISION var var
+               return result = 17;
            }
            error = sentencia;
            if(result < 0){
@@ -77,6 +107,16 @@ public class Compilador extends javax.swing.JFrame {
                    this.Error.setText(text + "\n" + "El resultado de la division es: "+resultado);
                    break;
                case 4: //Declaracion de variables (proximo a programar)
+                   //Se supone que las variables vienen como el siguiente ejemplo: INT nombe 23;
+                   //entonces se sabe que array[1] es el nombre de la variable y array[2] el valor, entonces hay que buscar array[1] en los
+                   //indices del hashmap para ver si la variable ya esta declarada, y si no, ingresarla
+                   array = sentencia.split(" ");
+                   if(vars.containsKey(array[1])){ //la variable ya esta
+                       this.Error.setText("La variable "+array[1]+" ya esta declarada");
+                       return;
+                   }else{ //la variable no esta en el arreglo
+                       vars.put(array[1], Integer.parseInt(array[2]));
+                   }
                    break;
                case 5: //Imprimir
                    array = sentencia.split(" ");
@@ -87,7 +127,38 @@ public class Compilador extends javax.swing.JFrame {
                    }
                    this.Error.setText(text + "\n" + mensaje);
                    break;
-                
+               case 6: //SUMA var num
+                   //Sabemos que ya viene con una estructura, entonces se debe busar la variable en el hasmap para ver si esta definida y sacar el valor
+                   array = sentencia.split(" ");
+                   if(vars.containsKey(array[1])){ //significa que la variable si esta
+                       resultado = Integer.parseInt(array[2]) + vars.get(array[1]);
+                       this.Error.setText(text + "\n" + "El resultado de la suma es: "+resultado);
+                   } else{
+                       this.Error.setText("La variable "+array[1]+" no esta declarada");
+                   }
+                   break;
+               case 7:
+                   break; 
+               case 8:
+                   break; 
+               case 9: 
+                   break;
+               case 10:
+                   break; 
+               case 11: 
+                   break; 
+               case 12: 
+                   break; 
+               case 13: 
+                   break; 
+               case 14: 
+                   break; 
+               case 15: 
+                   break; 
+               case 16: 
+                   break;
+               case 17: 
+                   break;
            }
        }
        
@@ -331,6 +402,7 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_LimpiarActionPerformed
 
     private void compejecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_compejecutarActionPerformed
+        vars.clear(); //limpiamos por si la persona quiere compilar y ejecutar varias veces
         String texto = this.txtATexto1.getText();
         StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
         String sentencia = "";
