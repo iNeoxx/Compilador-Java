@@ -15,153 +15,155 @@ import java.util.HashMap;
 public class Compilador extends javax.swing.JFrame {
 
     /**
-     
+     *
      */
-       int cont = 0;
-       int num1; 
-       int num2;
-       //Expresiones regulares
-       String palabras[] = {"SUMA","RESTA","MULTIPLICACION","DIVISION", "INT", "IMPRIMIR"}; //conjunto de palabras reservadas
-       String numberDel = "*\\s.*\\d.*\\s.*\\d";  //Expresion regular para poner numeros
-       String varDel = "*\\s.*\\w*\\s*\\d"; //expresion regular para poner variables
-       String letterDel = "*\\s.*\\w";
-       String singleNum = "*\\s.*\\d";
-       HashMap<String, Integer> vars = new HashMap<>();
-       
-       public byte sintax(String pSentencia){
-           StringTokenizer tokens = new StringTokenizer(pSentencia, ";\n\r"); //no c pq se hace esto de nuevo porque creo que ya se hizo, pero no pasa nada si se queda
-           byte result = -2; 
-           
-           String sentencia = tokens.nextToken();
-           String error = " ";
-           if(sentencia.matches(this.palabras[0]+this.numberDel)){ //Suma
-               return result = 0;
-           } else if(sentencia.matches(this.palabras[1]+this.numberDel)){ //Resta
-               return result = 1;
-           } else if(sentencia.matches(this.palabras[2]+this.numberDel)){ //Multiplicacion
-               return result = 2;
-           } else if(sentencia.matches(this.palabras[3]+this.numberDel)){ //Division
-               return result = 3;
-           } else if(sentencia.matches(this.palabras[4]+this.varDel)){ //Declaracion de variables
-               return result = 4;
-           } else if(sentencia.matches(this.palabras[5]+this.letterDel)){ //imprimir
-               return result = 5;
-           }
-           //Aqui vamos a jugar con las funciones usando variables previamente almacenadas; 
-           //entonces, las posibilidades son PALABRARESERVADA varaible numero, PALABRARESERVADA numero variable.
-           else if(sentencia.matches(this.palabras[0]+this.letterDel+this.singleNum)){ //SUMA var num
-               return result = 6;
-           } else if(sentencia.matches(this.palabras[0]+this.singleNum+this.letterDel)){ //SUMA num var
-               return result = 7; 
-           } else if(sentencia.matches(this.palabras[0] + this.letterDel + this.letterDel)){ //SUMA var var
-               return result = 8;
-           } else if(sentencia.matches(this.palabras[1]+this.letterDel+this.singleNum)){ //RESTA var num
-               return result = 9;
-           } else if(sentencia.matches(this.palabras[1]+this.singleNum+this.letterDel)){ //RESTA num var
-               return result = 10; 
-           } else if(sentencia.matches(this.palabras[1] + this.letterDel + this.letterDel)){ //RESTA var var
-               return result = 11;
-           }else if(sentencia.matches(this.palabras[2]+this.letterDel+this.singleNum)){ //MULTIPLICACION var num
-               return result = 12;
-           } else if(sentencia.matches(this.palabras[2]+this.singleNum+this.letterDel)){ //MULTIPLICACION num var
-               return result = 13; 
-           } else if(sentencia.matches(this.palabras[2] + this.letterDel + this.letterDel)){ //MULTIPLICACION var var
-               return result = 14;
-           }else if(sentencia.matches(this.palabras[3]+this.letterDel+this.singleNum)){ //DIVISION var num
-               return result = 15;
-           } else if(sentencia.matches(this.palabras[3]+this.singleNum+this.letterDel)){ //DIVISION num var
-               return result = 16; 
-           } else if(sentencia.matches(this.palabras[3] + this.letterDel + this.letterDel)){ //DIVISION var var
-               return result = 17;
-           }
-           error = sentencia;
-           if(result < 0){
-               this.Error.setText("Error de sintaxis. "+ error + " no es valido");
-           }
-           return result; 
-       }
-       
-       public void switchFun(int pPoss, String sentencia){
-           String array[]; //arreglo de 20 (espero que sea suficiente) para almacenar las partes del token y poder dividir palabras claves de variables o numeros
-           int resultado;
-           String text = this.Error.getText();
-           switch(pPoss){ //Dependiendo del numero que devuelve la funcion de sintaxis, va a entrar a uno uu otro sqitch
-               case 0: //Suma
-                   array = sentencia.split(" "); //Aqui dividimos el token para que la palabra quede separada de los numeros
-                   resultado = Integer.parseInt(array[1]) + Integer.parseInt(array[2]);
-                   this.Error.setText(text + "\n" + "El resultado de la suma es: "+resultado);
-                   break;
-               case 1: //Resta
-                   array = sentencia.split(" ");
-                   resultado = Integer.parseInt(array[1]) - Integer.parseInt(array[2]);
-                   this.Error.setText(text + "\n" + "El resultado de la resta es: "+resultado);
-                   break; 
-               case 2: //Multiplicacion
-                   array = sentencia.split(" ");
-                   resultado = Integer.parseInt(array[1]) * Integer.parseInt(array[2]);
-                   this.Error.setText(text + "\n" + "El resultado de la multiplicacion es: "+resultado);
-                   break;
-               case 3: //Division
-                   array = sentencia.split(" ");
-                   resultado = Integer.parseInt(array[1]) / Integer.parseInt(array[2]);
-                   this.Error.setText(text + "\n" + "El resultado de la division es: "+resultado);
-                   break;
-               case 4: //Declaracion de variables (proximo a programar)
-                   //Se supone que las variables vienen como el siguiente ejemplo: INT nombe 23;
-                   //entonces se sabe que array[1] es el nombre de la variable y array[2] el valor, entonces hay que buscar array[1] en los
-                   //indices del hashmap para ver si la variable ya esta declarada, y si no, ingresarla
-                   array = sentencia.split(" ");
-                   if(vars.containsKey(array[1])){ //la variable ya esta
-                       this.Error.setText("La variable "+array[1]+" ya esta declarada");
-                       return;
-                   }else{ //la variable no esta en el arreglo
-                       vars.put(array[1], Integer.parseInt(array[2]));
-                   }
-                   break;
-               case 5: //Imprimir
-                   array = sentencia.split(" ");
-                   System.out.println(array.length);
-                   String mensaje = ""; 
-                   for(int i = 1; i < array.length; i++){
-                       mensaje = mensaje + " " +array[i];
-                   }
-                   this.Error.setText(text + "\n" + mensaje);
-                   break;
-               case 6: //SUMA var num
-                   //Sabemos que ya viene con una estructura, entonces se debe busar la variable en el hasmap para ver si esta definida y sacar el valor
-                   array = sentencia.split(" ");
-                   if(vars.containsKey(array[1])){ //significa que la variable si esta
-                       resultado = Integer.parseInt(array[2]) + vars.get(array[1]);
-                       this.Error.setText(text + "\n" + "El resultado de la suma es: "+resultado);
-                   } else{
-                       this.Error.setText("La variable "+array[1]+" no esta declarada");
-                   }
-                   break;
-               case 7:
-                   break; 
-               case 8:
-                   break; 
-               case 9: 
-                   break;
-               case 10:
-                   break; 
-               case 11: 
-                   break; 
-               case 12: 
-                   break; 
-               case 13: 
-                   break; 
-               case 14: 
-                   break; 
-               case 15: 
-                   break; 
-               case 16: 
-                   break;
-               case 17: 
-                   break;
-           }
-       }
-       
+    int cont = 0;
+    int num1;
+    int num2;
+
+    //Expresiones regulares
+    String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION", "INT", "IMPRIMIR"}; //conjunto de palabras reservadas
+    boolean stopSystem = false; //Se usa en caso de que ocurra un error en la funcion sintaxis
+    HashMap<String, Integer> vars = new HashMap<>();
+
+    public void sintax(String pSentencia, boolean pActionSwitch) {
+        boolean activeSwitch = pActionSwitch;
+        byte result = -2;
+        
+        int value1 = 0;
+        int value2 = 0;
+        String mensaje = "",text = " ";
+        String[] array = new String[3];
+
+       // byte saveVar = 0;
+        array = pSentencia.split(" ");
+
+        for (byte i = 0; i < this.palabras.length; i++) {//Se recorre buscando la funcion
+            if (array[0].matches(this.palabras[i])) {
+                result = i;
+                break;
+            }
+        }
+        if (result >= 0) {
+            if (result == 4) { //En caso de que sea una varible                                
+                //saveVar = this.sintaxVariable(pSentencia);
+                if(this.sintaxVariable(pSentencia) != 1){ //SI es diferente de 1 sigifica que hubo un error => (duplicidad,no existe,guarda letras)
+                    return;
+                }                               
+            }//Fin Verificacion Variable
+            else if (result == 5) {//Se verifica la funcion IMPRIMIR
+                array = pSentencia.split(" ");
+                System.out.println(array.length);
+                text = this.Error.getText();
+                for (int i = 1; i < array.length; i++) { //Se toma el mensaje
+                    mensaje = mensaje + " " + array[i];
+                }                
+                return;
+                
+            }//Fin Imprimir
+            
+            //Como las funciones se van a trabajar con 2 valores por eso lo hice asi
+            //Se procede a verificar si son numeros o variables
+            value1 = getValue(array[1]);
+            value2 = getValue(array[2]);
+            
+            if(value1 == 'n' || value2 =='n'){//Si alguno de los valores no es valido         
+                activeSwitch = false;//Se desactiva el switch en caso de que la variable o numero no sea valido
+                return;
+            }else{   
+                if(!activeSwitch){//Se activa el Swicth si la funcion es llamada desde el boton compilar
+                this.Error.setText("Compilacion Exitosa");
+                }
+            }            
+            
+            if(activeSwitch){//Se activa el Swicth, ya que la funcion es llamada por "CompilaryEjecutar"
+                fnSwitch(result,value1,value2,mensaje);                
+            }
+            
+        } else {
+            this.Error.setText("Error de Compilacion");
+            this.stopSystem = true;
+        }
+    }
+    public int getValue(String pVariable){
+        boolean numeric = pVariable.matches("\\d*");
+        if (numeric) {
+                return Integer.parseInt(pVariable);
+
+            } else {
+                if (this.vars.containsKey(pVariable)) {
+                    return this.vars.get(pVariable);
+                }else{
+                    this.Error.setText("Errror!!! La variable: "+pVariable+" no existe.");
+                    this.stopSystem = true;
+                }
+            }
+        return 'n';
+    }
+
+    public void fnSwitch(byte pPoss, int value1, int value2,String pMensaje) {
+        String text = this.Error.getText();
+            int resultado = 0;
+        switch (pPoss) {
+            case 0://Suma
+               resultado = value1 + value2;
+                this.Error.setText(text + "\n" + "El resultado de la suma es: " + resultado);
+                 
+                break;
+            case 1://Resta
+                    resultado = value1 - value2;
+                this.Error.setText(text + "\n" + "El resultado de la resta es: " + resultado);
+                break;
+                
+            case 2://Multiplicacion
+                resultado = value1 * value2;
+                this.Error.setText(text + "\n" + "El resultado de la multiplicacion es: " + resultado);
+                break;
+            case 3://Division
+                resultado = value1 / value2;
+                this.Error.setText(text + "\n" + "El resultado de la division es: " + resultado);
+                break;
+            case 5://Imprimir
+                 this.Error.setText(text + "\n" + pMensaje);               
+                break;
+        }
+
+    }
+
+    public byte sintaxVariable(String pSentencia) {
+        String array[]; //= new String[3];
+        boolean insert = false;
+        boolean numeric = false;
+        array = pSentencia.split(" ");
+        numeric = array[2].matches("\\d*");
+        
+        //Vertifica que el nombre de la variable no se encuentre en el arreglo de palabras reservadas
+        for (byte j = 0; j < this.palabras.length; j++) {
+            insert = this.palabras[j].equals(array[1]);//True == Encuentra coincidencias 
+            if (insert) {//Si encuentra coincidencias se debe de salir
+                this.Error.setText("Errror!!! El nombre: " + array[1] + " es una palabra reservada.");
+                this.stopSystem = true;
+                return 0;// No Permitido
+            }
+        }
+        if (this.vars.containsKey(array[1])) {
+            this.Error.setText("Errror!!! La variable: " + array[1] + " ya se encuentra declarada.");
+            this.stopSystem = true;
+            return 2;//Ya se encuentra registrada
+        } else {
+            if (numeric) {
+                //Inserta la variable con el valor
+                this.vars.put(array[1], Integer.parseInt(array[2]));
+                return 1;
+            } else {//No ingresa ya que la varibale contiene letras
+                this.stopSystem = true;
+                this.Error.setText("Errror!!! La Variable: " + array[1] + " solo admite numeros.");
+                return 3;
+            }
+        }
+
+    }
+
     public Compilador() {
         initComponents();
     }
@@ -380,18 +382,20 @@ public class Compilador extends javax.swing.JFrame {
     private void CompilarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CompilarActionPerformed
         String texto = this.txtATexto1.getText();
         this.Error.setText(" ");
+        vars.clear(); //limpiamos por si la persona quiere compilar varias veces
+        this.stopSystem = false;
         StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
-        String sentencia = tokens.nextToken();
-        byte i = 0;
+        String sentencia = "";
+        
+
         while (tokens.hasMoreTokens()) {
-            sentencia = tokens.nextToken(); 
-            i = this.sintax(sentencia);
-            if(i>=0){
-                Error.setText("Compilado Exitosamente!");
-            }else{
-                System.out.println("Fallo en el compilar XD");
+
+            sentencia = tokens.nextToken();
+            if(!stopSystem){
+             sintax(sentencia, false);            
+            }else
                 return;
-            }
+
         }
     }//GEN-LAST:event_CompilarActionPerformed
 
@@ -402,19 +406,18 @@ public class Compilador extends javax.swing.JFrame {
     }//GEN-LAST:event_LimpiarActionPerformed
 
     private void compejecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_compejecutarActionPerformed
+        this.Error.setText(" ");
+        this.stopSystem = false;
         vars.clear(); //limpiamos por si la persona quiere compilar y ejecutar varias veces
         String texto = this.txtATexto1.getText();
         StringTokenizer tokens = new StringTokenizer(texto, ";\n\r");
-        String sentencia = "";
-        byte i = 0;
-        while(tokens.hasMoreTokens()){
+        String sentencia = "";        
+        while (tokens.hasMoreTokens()) {
             sentencia = tokens.nextToken();
-            i = this.sintax(sentencia);
-            if(i >= 0){
-                this.switchFun(i, sentencia);
-            } else{
+           if(!stopSystem){
+             sintax(sentencia, true);//Como se ejecuta se manda  true para que se ejecuten las funciones      
+            }else
                 return;
-            }
         }
     }//GEN-LAST:event_compejecutarActionPerformed
 
@@ -467,4 +470,5 @@ public class Compilador extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JEditorPane txtATexto1;
     // End of variables declaration//GEN-END:variables
+
 }
