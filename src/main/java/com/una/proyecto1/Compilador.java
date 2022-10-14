@@ -22,7 +22,7 @@ public class Compilador extends javax.swing.JFrame {
     int num2;
 
     //Expresiones regulares
-    String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION", "INT", "IMPRIMIR"}; //conjunto de palabras reservadas
+    String palabras[] = {"SUMA", "RESTA", "MULTIPLICACION", "DIVISION", "INT", "IMPRIMIR", "ELEVAR", "RAIZ2", "RAIZ3", "FIBONACCI"}; //conjunto de palabras reservadas
     boolean stopSystem = false; //Se usa en caso de que ocurra un error en la funcion sintaxis
     HashMap<String, Integer> vars = new HashMap<>();
 
@@ -37,7 +37,7 @@ public class Compilador extends javax.swing.JFrame {
 
        // byte saveVar = 0;
         array = pSentencia.split(" ");
-
+        System.out.println(array.length);
         for (byte i = 0; i < this.palabras.length; i++) {//Se recorre buscando la funcion
             if (array[0].matches(this.palabras[i])) {
                 result = i;
@@ -57,15 +57,24 @@ public class Compilador extends javax.swing.JFrame {
                 text = this.Error.getText();
                 for (int i = 1; i < array.length; i++) { //Se toma el mensaje
                     mensaje = mensaje + " " + array[i];
-                }                
+                }
+                this.Error.setText(text + "\n" +mensaje);
+                System.out.println(mensaje);
+                
                 return;
                 
             }//Fin Imprimir
             
             //Como las funciones se van a trabajar con 2 valores por eso lo hice asi
             //Se procede a verificar si son numeros o variables
-            value1 = getValue(array[1]);
-            value2 = getValue(array[2]);
+            //Puede que el array venga de 2 (caso de las funciones de raiz) o de 3
+            if(array.length ==2){
+                value1 = getValue(array[1]);
+            } else{
+                value1 = getValue(array[1]);
+                value2 = getValue(array[2]);
+            }
+            
             
             if(value1 == 'n' || value2 =='n'){//Si alguno de los valores no es valido         
                 activeSwitch = false;//Se desactiva el switch en caso de que la variable o numero no sea valido
@@ -100,7 +109,19 @@ public class Compilador extends javax.swing.JFrame {
             }
         return 'n';
     }
-
+    
+    public int fibo(int n){
+         if (n == 0) {
+            return 0;   
+        } else if (n == 1) {
+            return 1;
+        } else {
+            //Hago la suma
+            return fibo(n - 1) + fibo(n - 2);
+        }
+ 
+    }
+    
     public void fnSwitch(byte pPoss, int value1, int value2,String pMensaje) {
         String text = this.Error.getText();
             int resultado = 0;
@@ -125,6 +146,30 @@ public class Compilador extends javax.swing.JFrame {
                 break;
             case 5://Imprimir
                  this.Error.setText(text + "\n" + pMensaje);               
+                break;
+            case 6: //Potencia
+                resultado = 1;
+                System.out.println(value1);
+                System.out.println(value2);
+                while(value2 != 0){
+                    resultado = resultado * value1;
+                    value2--;
+                }
+                 this.Error.setText(text + "\n" + "El resultado de la potencia es: " + resultado);
+                break;
+            case 7: //Raiz cuadrada
+                resultado = (int) Math.sqrt(value1);
+                this.Error.setText(text + "\n" + "El resultado de la raiz cuadrada es: " + resultado);
+                break;
+            case 8: //Raiz cubica
+                float val1 = value1;
+                double res2; 
+                res2 = Math.pow(val1, (double) 1/3);
+                this.Error.setText(text + "\n" + "El resultado de la raiz cubica es: " + res2);
+                break;
+            case 9: //Fibonacci
+                resultado = fibo(value1);
+                this.Error.setText(text + "\n" + "Fibonacci de "+value1+" es: " +resultado);
                 break;
         }
 
